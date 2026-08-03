@@ -1,203 +1,358 @@
-# AI-Powered Job Recommendation Engine
+# 🚀 AI-Powered Job Recommendation Engine
 
-A full-stack RAG-powered job matching application with personalized cover letter generation and interview prep — built with **LangChain + FAISS**, **FastAPI**, **React.js**, and deployed on **Render** via **GitHub Actions CI/CD**.
+<p align="center">
+
+![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green?logo=fastapi)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)
+![LangChain](https://img.shields.io/badge/LangChain-RAG-success)
+![Gemini](https://img.shields.io/badge/Google-Gemini-orange?logo=google)
+![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker)
+![FAISS](https://img.shields.io/badge/FAISS-Vector%20Search-purple)
+![License](https://img.shields.io/badge/License-MIT-blue)
+
+</p>
+
+An AI-powered career assistant that helps candidates:
+
+- 🔍 Match resumes against multiple job descriptions using **RAG + FAISS**
+- ✍️ Generate personalized cover letters
+- 🎯 Generate interview questions tailored to a specific role
+- 🤖 Powered by **Google Gemini**, **LangChain**, **FastAPI**, and **React**
 
 ---
 
-## Architecture
+# ✨ Features
+
+### 🔍 AI Job Matching
+
+- Resume semantic search using FAISS
+- Gemini-powered job relevance scoring
+- Skill gap identification
+- Match explanation
+- Ranked recommendations
+
+---
+
+### ✍️ AI Cover Letter Generator
+
+- Personalized cover letters
+- Multiple writing tones
+- ATS-friendly language
+- Job-specific customization
+
+---
+
+### 🎤 AI Interview Preparation
+
+- Technical interview questions
+- HR interview questions
+- Scenario-based questions
+- Project-based questions
+- Role-specific preparation
+
+---
+
+# 🏗️ System Architecture
 
 ```
-┌────────────────────────────────────────────────────────┐
-│                    React.js Frontend                   │
-│   JobMatcher │ CoverLetter │ InterviewPrep             │
-└──────────────────────┬─────────────────────────────────┘
-                       │ HTTP (Axios)
-┌──────────────────────▼─────────────────────────────────┐
-│                  FastAPI Backend                        │
-│   /api/jobs/match                                       │
-│   /api/cover-letter/generate                           │
-│   /api/interview-prep/generate                         │
-└──────────┬──────────────────────┬──────────────────────┘
-           │                      │
-  ┌────────▼────────┐    ┌────────▼────────┐
-  │  RAG Pipeline   │    │  GPT-4 Services │
-  │  LangChain      │    │  Cover Letter   │
-  │  + FAISS index  │    │  Interview Prep │
-  │  + Embeddings   │    └─────────────────┘
-  └─────────────────┘
+                        React Frontend
+                               │
+                        Axios / REST API
+                               │
+                    FastAPI Backend (Python)
+          ┌────────────────────┼────────────────────┐
+          │                    │                    │
+     Job Matcher         Cover Letter        Interview Prep
+          │
+          ▼
+      RAG Pipeline
+          │
+ ┌─────────────────────┐
+ │ LangChain           │
+ │ Recursive Splitter  │
+ │ Gemini Embeddings   │
+ │ FAISS Vector Store  │
+ └─────────────────────┘
+          │
+          ▼
+ Google Gemini 3.5 Flash
 ```
 
-### RAG Pipeline (>85% relevance accuracy)
-1. Resume is chunked with `RecursiveCharacterTextSplitter`
-2. Chunks embedded via OpenAI `text-embedding-3-small`
-3. FAISS vector store built in-memory per request
-4. Each job description queries the FAISS index for the top-3 most relevant resume chunks
-5. GPT-4 scores, explains, and ranks each match with the retrieved context
+---
+
+# 🧠 RAG Workflow
+
+1️⃣ Resume is split into semantic chunks
+
+2️⃣ Chunks are converted into vector embeddings using
+
+```
+models/gemini-embedding-001
+```
+
+3️⃣ FAISS creates an in-memory vector database
+
+4️⃣ Every job description retrieves the most relevant resume chunks
+
+5️⃣ Gemini analyzes:
+
+- Resume
+- Job Description
+- Retrieved Context
+
+6️⃣ Returns
+
+- ✅ Match Score
+- ✅ Matching Skills
+- ✅ Skill Gaps
+- ✅ AI Explanation
 
 ---
 
-## Tech Stack
+# 🛠 Tech Stack
 
-| Layer | Technology |
-|---|---|
-| LLM | GPT-4o (OpenAI) |
-| RAG Framework | LangChain |
-| Vector Store | FAISS (faiss-cpu) |
-| Embeddings | OpenAI text-embedding-3-small |
-| Backend | FastAPI + Uvicorn |
-| Frontend | React.js |
-| Containerization | Docker + Docker Compose |
-| Deployment | Render |
-| CI/CD | GitHub Actions |
+| Category | Technology |
+|-----------|------------|
+| 🤖 LLM | Google Gemini 3.5 Flash |
+| 🧠 Embeddings | Gemini Embedding 001 |
+| 🔎 RAG | LangChain |
+| 📚 Vector Database | FAISS |
+| ⚡ Backend | FastAPI |
+| 🎨 Frontend | React.js |
+| 🐳 Containerization | Docker |
+| 🔄 API | REST |
+| 📦 Package Manager | npm + pip |
+| ☁️ Deployment | Render |
+| 🚀 CI/CD | GitHub Actions |
 
 ---
 
-## Project Structure
+# 📂 Project Structure
 
 ```
 job-engine/
-├── backend/
-│   ├── app/
-│   │   ├── main.py              # FastAPI app + CORS
-│   │   ├── core/config.py       # Settings (pydantic-settings)
-│   │   ├── models/schemas.py    # Pydantic request/response models
-│   │   ├── api/
-│   │   │   ├── jobs.py          # POST /api/jobs/match
-│   │   │   ├── cover_letter.py  # POST /api/cover-letter/generate
-│   │   │   └── interview_prep.py# POST /api/interview-prep/generate
-│   │   └── services/
-│   │       ├── rag_pipeline.py  # LangChain + FAISS RAG
-│   │       ├── cover_letter_service.py
-│   │       └── interview_prep_service.py
-│   ├── tests/test_api.py
+
+├── backend
+│   ├── app
+│   │   ├── api
+│   │   ├── core
+│   │   ├── models
+│   │   ├── services
+│   │   └── main.py
+│   │
+│   ├── tests
 │   ├── requirements.txt
 │   ├── Dockerfile
 │   └── .env.example
-├── frontend/
-│   ├── src/
-│   │   ├── App.js / App.css
-│   │   ├── components/
-│   │   │   ├── JobMatcher.jsx
-│   │   │   ├── CoverLetter.jsx
-│   │   │   └── InterviewPrep.jsx
-│   │   └── services/api.js
-│   ├── package.json
+│
+├── frontend
+│   ├── src
+│   ├── public
 │   ├── Dockerfile
 │   └── nginx.conf
-├── .github/workflows/ci-cd.yml
-└── docker-compose.yml
+│
+├── docker-compose.yml
+├── README.md
+└── .github/workflows
 ```
 
 ---
 
-## Local Development
+# ⚙️ Installation
 
-### Prerequisites
-- Python 3.12+
-- Node.js 20+
-- Docker & Docker Compose
-- OpenAI API key
-
-### 1. Clone and configure
+## Clone Repository
 
 ```bash
-git clone https://github.com/your-username/job-engine.git
+git clone https://github.com/<your-username>/job-engine.git
+
 cd job-engine
-
-cp backend/.env.example backend/.env
-# Edit backend/.env and add your OPENAI_API_KEY
-```
-
-### 2. Run with Docker Compose
-
-```bash
-docker-compose up --build
-```
-
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- Swagger docs: http://localhost:8000/docs
-
-### 3. Run without Docker
-
-```bash
-# Backend
-cd backend
-python -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-
-# Frontend (new terminal)
-cd frontend
-npm install
-npm start
 ```
 
 ---
 
-## API Reference
+## Configure Environment
 
-### POST /api/jobs/match
-```json
-{
-  "resume": "string",
-  "job_descriptions": ["string", "string"]
-}
+Create
+
 ```
-Returns ranked matches with relevance scores (0–100), matched skills, reasoning, and skill gaps.
-
-### POST /api/cover-letter/generate
-```json
-{
-  "candidate_profile": "string",
-  "job_description": "string",
-  "tone": "professional | enthusiastic | concise | creative"
-}
+backend/.env
 ```
 
-### POST /api/interview-prep/generate
-```json
-{
-  "candidate_profile": "string",
-  "job_description": "string"
-}
+Example
+
+```env
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+
+LLM_MODEL=models/gemini-3.5-flash
+
+EMBEDDING_MODEL=models/gemini-embedding-001
+
+ALLOWED_ORIGINS=["http://localhost:3000"]
+
+MAX_TOKENS=1500
 ```
 
 ---
 
-## Deployment on Render
-
-### Backend (Web Service)
-1. Create a new **Web Service** on Render
-2. Set **Root Directory**: `backend`
-3. Set **Build Command**: `pip install -r requirements.txt`
-4. Set **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-5. Add environment variables:
-   - `OPENAI_API_KEY`
-   - `ALLOWED_ORIGINS` → your frontend URL
-
-### Frontend (Static Site or Web Service)
-1. Create a **Static Site** on Render
-2. Set **Root Directory**: `frontend`
-3. Set **Build Command**: `npm install && npm run build`
-4. Set **Publish Directory**: `build`
-5. Add env var: `REACT_APP_API_URL` → your backend Render URL
-
-### CI/CD (GitHub Actions)
-Add these secrets to your GitHub repository:
-- `OPENAI_API_KEY`
-- `RENDER_API_KEY` (from Render dashboard → Account Settings)
-- `RENDER_BACKEND_SERVICE_ID`
-- `RENDER_FRONTEND_SERVICE_ID`
-
-Every push to `main` runs tests then auto-deploys both services.
-
----
-
-## Running Tests
+## Run using Docker
 
 ```bash
-cd backend
-pip install pytest httpx pytest-asyncio
-pytest tests/ -v
+docker compose up --build
 ```
+
+---
+
+Frontend
+
+```
+http://localhost:3000
+```
+
+Backend
+
+```
+http://localhost:8000
+```
+
+Swagger
+
+```
+http://localhost:8000/docs
+```
+
+---
+
+# 📡 REST APIs
+
+## 🔍 Match Jobs
+
+```
+POST /api/jobs/match
+```
+
+```json
+{
+  "resume":"...",
+  "job_descriptions":[
+    "...",
+    "..."
+  ]
+}
+```
+
+---
+
+## ✍️ Generate Cover Letter
+
+```
+POST /api/cover-letter/generate
+```
+
+```json
+{
+    "candidate_profile":"...",
+    "job_description":"...",
+    "tone":"professional"
+}
+```
+
+---
+
+## 🎤 Interview Preparation
+
+```
+POST /api/interview-prep/generate
+```
+
+```json
+{
+    "candidate_profile":"...",
+    "job_description":"..."
+}
+```
+
+---
+
+# 🐳 Docker
+
+```bash
+docker compose up --build
+```
+
+Stop
+
+```bash
+docker compose down
+```
+
+---
+
+# ☁️ Deployment
+
+Deploy easily on
+
+- Render
+- Railway
+- Azure
+- AWS
+- Google Cloud
+
+---
+
+# 🔄 GitHub Actions CI/CD
+
+Every push to the **main** branch automatically
+
+- ✅ Runs tests
+- ✅ Builds Docker image
+- ✅ Deploys application
+- ✅ Updates Render service
+
+---
+
+# 📸 Screenshots
+
+| Feature | Screenshot |
+|----------|------------|
+| 🔍 Job Matcher | Add Screenshot |
+| ✍️ Cover Letter | Add Screenshot |
+| 🎤 Interview Prep | Add Screenshot |
+
+---
+
+# 🎯 Future Improvements
+
+- 📄 Resume PDF Upload
+
+- 🧠 Resume Parsing
+
+- 🌍 LinkedIn Profile Analysis
+
+- 📈 ATS Resume Score
+
+- 🎙 Mock Interview
+
+- 🔊 Voice Interview
+
+- 📊 Candidate Analytics Dashboard
+
+- 🌐 Multi-language Support
+
+---
+
+# 👨‍💻 Author
+
+**Nihar**
+
+Java Backend Developer | AI Enthusiast
+
+GitHub:
+https://github.com/<your-username>
+
+LinkedIn:
+https://linkedin.com/in/<your-linkedin>
+
+---
+
+⭐ If you found this project useful, don't forget to Star the repository.
