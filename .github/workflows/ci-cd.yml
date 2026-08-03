@@ -28,7 +28,7 @@ jobs:
       - name: Run tests
         run: pytest tests/ -v --tb=short
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
   test-frontend:
     name: Test Frontend
@@ -43,7 +43,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
@@ -53,7 +53,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          REACT_APP_API_URL: https://placeholder.onrender.com
+          VITE_API_URL: https://placeholder.onrender.com
 
   deploy:
     name: Deploy to Render
