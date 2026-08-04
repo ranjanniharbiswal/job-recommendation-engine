@@ -2,7 +2,7 @@ import pytest
 from httpx import AsyncClient, ASGITransport
 from unittest.mock import AsyncMock, patch
 from app.main import app
-
+from app.models.schemas import JobMatch
 
 @pytest.mark.asyncio
 async def test_health():
@@ -39,7 +39,8 @@ async def test_match_jobs_mock():
         }
     ]
     with patch("app.api.jobs.rag_pipeline.match_jobs", new=AsyncMock(return_value=[
-        type("JobMatch", (), m)() for m in mock_matches
+        # type("JobMatch", (), m)()
+        JobMatch(**m) for m in mock_matches
     ])):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             r = await client.post("/api/jobs/match", json={

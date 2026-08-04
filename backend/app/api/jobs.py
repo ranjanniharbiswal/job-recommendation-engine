@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from app.models.schemas import MatchRequest, MatchResponse
 from app.services.rag_pipeline import rag_pipeline
+import traceback
 
 router = APIRouter()
 
@@ -24,3 +25,6 @@ async def match_jobs(request: MatchRequest):
         return MatchResponse(matches=matches)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    # except Exception as e:
+    #     traceback.print_exc()
+    #     raise
